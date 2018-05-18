@@ -9,6 +9,11 @@ import shutil
 import stat
 import pwd
 
+import smtplib
+from email.mime.text import MIMEText
+
+# contacts={"aman":"aman.parmar17@gmail.com","anjali":"anjuanjisharma08@gmail.com","devansh":"devanshalok@gmail.com","rani":"ranikhaneja@gmail.com"}
+
 """file discriptors::: this is the number returned by the open file which is saved somewhere in the kernel and uniquely identifies the
 OPENED file..."""
 
@@ -40,6 +45,7 @@ class MyPrompt(Cmd):
         val="read "+args
         put(val)
 
+
     def do_exist(self,args):
         """checks whether the file location entered, exists or not
         Syntax: exist<SPACE>(your file location)\n
@@ -57,7 +63,7 @@ class MyPrompt(Cmd):
 
     def do_knowfile(self,args):
         """returns the discription of the file given as the argument.
-        NOTE: if the result is filtered using mode method, it returns the node of the file in octal form"""
+        NOTE: if the result is filtered using mode method, it returns the mode of the file in octal form"""
 
         if " " in args:
 
@@ -148,13 +154,17 @@ class MyPrompt(Cmd):
                    path_name(for new location)"""
         if(args==".."):
             os.chdir(os.path.abspath(os.getcwd()))
-        # print(os.getcwd())
+
+
         if(os.path.exists(args)):
             print("true")
             os.chdir(args)
             print(os.getcwd())
         else:
             print("error: no such file or directory exists.")
+        val = "cd" + args
+        put(val)
+
 
     def do_current(self,args):
         """return the current working directory"""
@@ -173,6 +183,7 @@ class MyPrompt(Cmd):
             Syntax:     list      // represent all the files and folders
                         list -<character set>       // filter the result of the list command on the basis of the given character set"""
         x = (os.listdir(os.getcwd()))
+        print("\n")
         if args == "":
             for i in x:
                 # print(os.listdir(os.getcwd()))
@@ -182,6 +193,10 @@ class MyPrompt(Cmd):
             for i in x:
                 if s in i:
                     print(i)
+        print("\n")
+        val="list"+args
+        put(val)
+
 
     def do_copyright(self,args):
         """print the members holding the copyright of the shell and other information"""
@@ -211,14 +226,14 @@ class MyPrompt(Cmd):
             x=input("Enter the mode of directory creation in int: ")
             os.mkdir(args1,int(x))
             print("\ndirectory successfully created")
-        val = "createdir " + args
+        val = "createdir " + args1
         put(val)
 
     def do_history(self,args):
         """list all the used commands till date,including the latest history one, in the old to new order."""
-        # val = "history " + args
-        # put(val)
         get()
+        val = "history " + args
+        put(val)
 
     def do_open(self,args):
         """open the file_name given as the argument, in the GEDIT editor, if the file exits \n
@@ -237,34 +252,87 @@ class MyPrompt(Cmd):
         val = "open " + args
         put(val)
 
+    def do_exec(self,args):
+        """executes or runs the given argument with the help of the associated application."""
+        if ".py" in args:
+            os.system("python3 "+args)
+        val="exec"+args
+        put(val)
+
+    def do_mailto(self,args):
+        """send a mail to the person mentioned as the argument of the function"""
+        # global contacts
+        contacts={}
+
+        co=open("contacts.txt","a+")
+        co.seek(0, 0)
+        x = co.read().splitlines()
+        for i in x:
+            d=i.split(" ")
+            contacts.update({d[0]:d[1]})
+
+
+
+        def sendmail(receiver):
+            body = input("please enter the text body of the mail: \n")
+            print("\n")
+            sender = "aman.parmar17@gmail.com"
+
+            msg = MIMEText(body)
+            msg["From"] = sender
+            msg["To"] = receiver
+            msg["Subject"] = "Greetings from SARA"
+
+            ss = smtplib.SMTP("smtp.gmail.com", 587)
+            ss.starttls()
+            ss.login("aman.parmar17@gmail.com", "aman.parmar17")
+
+            ss.send_message(msg)
+
+            print("your mail has been sent")
+            ss.quit()
+
+
+        if args in contacts:
+            receiver = contacts[args]
+            sendmail(receiver)
+        elif args=="":
+            print("no receiver mentioned")
+            exit()
+        else:
+            print("the receiver entered is not registered, press Y to register: ")
+            choice2=input()
+            if choice2 =="Y" or choice2 =="y":
+                detail=input("please enter the email id: ")
+                contacts.update({args:detail})
+                co.write(args + " " + detail + "\n")
+                print("contact regsitered \n")
+                choice=input("would you like to continue?\n Press Y/N \n")
+                if choice=="y" or choice=="Y":
+                    receiver=contacts[args]
+                    sendmail(receiver)
+        co.close()
 
 
 
 
-
-
-
-    def do_run(self,args):
-        if os.path.exists(args):
-            # f=os.open(args)
-            # fd=fileinput.fileno()
-            os.chmod(args,0o777)
-            sb=subprocess.call(os.path.abspath(args))
-            return sb.communicate()
+    # def do_contacts(self,args):
+    #     print(contacts)
 
 
 
 
-
-
-
-
-
-    # def do_dirname(self,args):
-    #     print(os.path.dirname(args))
-    #     print(os.path.)
-
-
+    #
+    #
+    #
+    # def do_run(self,args):
+    #     if os.path.exists(args):
+    #         # f=os.open(args)
+    #         # fd=fileinput.fileno()
+    #         os.chmod(args,0o777)
+    #         sb=subprocess.call(os.path.abspath(args))
+    #         return sb.communicate()
+    #
 
 
     # def do_pwd(self,sys.argv[1],):
@@ -299,3 +367,4 @@ if __name__ == '__main__':
     prompt.prompt = "[" + p + "]:"
     prompt.cmdloop('Starting prompt...')
     f.close()
+

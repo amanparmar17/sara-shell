@@ -276,7 +276,7 @@ class MyPrompt(Cmd):
         def sendmail(receiver):
             body = input("please enter the text body of the mail: \n")
             print("\n")
-            sender = "aman.parmar17@gmail.com"
+            sender = "__________________________"
 
             msg = MIMEText(body)
             msg["From"] = sender
@@ -285,7 +285,7 @@ class MyPrompt(Cmd):
 
             ss = smtplib.SMTP("smtp.gmail.com", 587)
             ss.starttls()
-            ss.login("aman.parmar17@gmail.com", "aman.parmar17")
+            ss.login("--------------------------", "______________________________")
 
             ss.send_message(msg)
 

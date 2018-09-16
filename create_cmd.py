@@ -8,12 +8,8 @@ import webbrowser
 import shutil
 import stat
 import pwd
-
 import smtplib
 from email.mime.text import MIMEText
-
-# contacts={"aman":"aman.parmar17@gmail.com","anjali":"anjuanjisharma08@gmail.com","devansh":"devanshalok@gmail.com","rani":"ranikhaneja@gmail.com"}
-
 """file discriptors::: this is the number returned by the open file which is saved somewhere in the kernel and uniquely identifies the
 OPENED file..."""
 
